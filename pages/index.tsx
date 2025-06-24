@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import PDFMerger from "../components/PDFMerger";
 import SubscriptionButton from "../components/SubscriptionButton";
 import styles from "../styles/Home.module.css";
+import 'remixicon/fonts/remixicon.css';
 
 const Home: NextPage = () => {
   const paypalOptions = {
