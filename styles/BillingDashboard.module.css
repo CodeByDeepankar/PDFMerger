@@ -1,0 +1,205 @@
+
+.dashboard {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.header h2 {
+  color: #1F2937;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: #6B7280;
+}
+
+.currentPlan {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.currentPlan h3 {
+  color: #1F2937;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.planInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.planDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.planName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.status {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.planPrice {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.billingInfo {
+  border-top: 1px solid #E2E8F0;
+  padding-top: 1rem;
+}
+
+.billingInfo p {
+  margin: 0;
+  color: #4B5563;
+}
+
+.usage {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.usage h3 {
+  color: #1F2937;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.usageInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.usageStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.usageLabel {
+  color: #4B5563;
+}
+
+.usageValue {
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.subscriptionId {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.subscriptionId h3 {
+  color: #1F2937;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.subscriptionId p {
+  margin: 0.5rem 0;
+  color: #4B5563;
+}
+
+.subscriptionId code {
+  background: #E5E7EB;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  color: #1F2937;
+}
+
+.features {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.features h3 {
+  color: #1F2937;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.featureList li {
+  padding: 0.5rem 0;
+  color: #4B5563;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.featureList li:last-child {
+  border-bottom: none;
+}
+
+.loading, .error {
+  padding: 2rem;
+  text-align: center;
+  border-radius: 0.5rem;
+}
+
+.loading {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+
+.error {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+    margin: 1rem;
+  }
+  
+  .planInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .usageStat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
