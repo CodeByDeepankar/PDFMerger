@@ -255,7 +255,7 @@
 .pricingCard.popular {
   border-color: #4F46E5;
   background: linear-gradient(135deg, #4F46E5, #7C3AED);
-  color: white;
+  color: #000000;
 }
 
 .popularBadge {
