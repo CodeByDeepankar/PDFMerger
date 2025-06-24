@@ -196,6 +196,7 @@ const Home: NextPage = () => {
           <div className={styles.footerSection}>
             <h4>PDFMerge Pro</h4>
             <p>Professional PDF merging made simple</p>
+            <p>Develope by <b>Deepankar</b></p>
           </div>
           <div className={styles.footerSection}>
             <h4>Product</h4>
@@ -206,11 +207,18 @@ const Home: NextPage = () => {
             </ul>
           </div>
           <div className={styles.footerSection}>
-            <h4>Support</h4>
+            <h4>Connect with developer</h4>
             <ul>
-              <li><a href="#">Help Center</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Privacy</a></li>
+              <li>
+                    <a href="https://linkedin.com/in/deepankarsahoo"><i className="ri-linkedin-box-fill">
+                  </i></a>
+                </li>
+                <li>
+                  <a href="https://x.com/codebydeepankar"><i className="ri-twitter-x-line"></i></a>
+                </li>
+                <li>
+                  <a href="https://github.com/codebydeepankar"><i className="ri-github-fill"></i></a>
+                </li>
             </ul>
           </div>
         </div>
