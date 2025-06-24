@@ -1,0 +1,48 @@
+
+/* Header Styles */
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h2 {
+  color: #4F46E5;
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.signInBtn {
+  background: #4F46E5;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.signInBtn:hover {
+  background: #4338CA;
+  transform: translateY(-1px);
+}

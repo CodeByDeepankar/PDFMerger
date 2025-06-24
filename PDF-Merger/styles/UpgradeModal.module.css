@@ -1,0 +1,159 @@
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: #374151;
+}
+
+.content {
+  padding: 24px;
+}
+
+.limit {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.limit h3 {
+  margin: 0 0 8px 0;
+  color: #dc2626;
+  font-size: 18px;
+}
+
+.limit p {
+  margin: 0;
+  color: #7f1d1d;
+}
+
+.pricing {
+  margin-bottom: 24px;
+}
+
+.pricing h4 {
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.pricing ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing li {
+  padding: 8px 0;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.pricing li:last-child {
+  border-bottom: none;
+}
+
+.pricing p {
+  margin: 8px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upgradeBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.upgradeBtn:hover {
+  transform: translateY(-2px);
+}
+
+.cancelBtn {
+  background: transparent;
+  color: #666;
+  border: 1px solid #ddd;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #f8f9fa;
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    padding: 10px;
+  }
+  
+  .modal {
+    max-height: 95vh;
+  }
+  
+  .header, .content {
+    padding: 16px;
+  }
+}
