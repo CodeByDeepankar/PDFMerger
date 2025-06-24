@@ -10,7 +10,7 @@ import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
   const paypalOptions = {
-    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID  as string,
     components: "buttons",
     intent: "subscription",
     vault: true
