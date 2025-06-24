@@ -19,7 +19,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
   if (!isOpen) return null;
 
   const paypalOptions = {
-    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "ATl3RReOfIjpOQYrgpNr2EoXM_ZknnlrMjgoLHeP5Ed53w4Q1cF4vjubQyJPNaDszbR7MtIyrMuqOZa1",
+    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
     components: "buttons",
     intent: "subscription",
     vault: true
