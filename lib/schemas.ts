@@ -13,9 +13,9 @@ export interface User {
   generations: number;
   dailyGenerations?: number;
   lastUsed?: Date;
+}
 
 export interface Plan {
-  _id?: string;
   name: string;
   price: number;
   paypalPlanId: string;
