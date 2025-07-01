@@ -11,6 +11,7 @@ const Navbar = () => {
           <h2>PDFMerge Pro</h2>
         </div>
         <div className={styles.authButtons}>
+          <SignedOut>
             <SignInButton>
               <button className={styles.signInBtn}>Sign In</button>
             </SignInButton>
@@ -18,7 +19,6 @@ const Navbar = () => {
           <SignedIn>
             <UserButton />
           </SignedIn>
-        </div>
       </div>
     </header>
   );
