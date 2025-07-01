@@ -30,10 +30,10 @@ const PDFMerger = () => {
           file,
           id: `${Date.now()}-${i}`
         });
+      }
+    }
     setFiles(prev => [...prev, ...newFiles]);
   };
-
-  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const droppedFiles = e.dataTransfer.files;
     handleFileSelect(droppedFiles);
