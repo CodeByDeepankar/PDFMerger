@@ -47,6 +47,14 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  try {
+    // Get user authentication
+    const { userId } = getAuth(req);
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
     // Check if user is pro
     const isPro = await isUserPro(userId);
     
@@ -60,14 +68,6 @@ export default async function handler(
         error: 'Daily limit exceeded', 
         message: 'You have used all 5 free merges for today. Please upgrade to Pro for unlimited merges or try again tomorrow.',
         dailyGenerations,
-        totalGenerations,
-        maxFreeDailyMerges: 5,
-        resetTime: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
-      });
-    }
-      });
-    }
-
     // Run multer middleware
     await runMiddleware(req, res, uploadMiddleware);
 
