@@ -14,10 +14,10 @@ const PDFMerger = () => {
   const [isMerging, setIsMerging] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [userGenerations, setUserGenerations] = useState(0);
-  const [maxFreeGenerations, setMaxFreeGenerations] = useState(1);
+  const [dailyGenerations, setDailyGenerations] = useState(0);
+  const [maxFreeDailyMerges] = useState(5);
+  const [resetTime, setResetTime] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = (selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
 
     const newFiles: UploadedFile[] = [];
@@ -73,14 +73,14 @@ const PDFMerger = () => {
       });
 
       if (response.status === 403) {
-        // Handle generation limit exceeded
+        // Handle daily limit exceeded
         const errorData = await response.json();
-        setUserGenerations(errorData.generations || 0);
-        setMaxFreeGenerations(errorData.maxFreeGenerations || 1);
+        setUserGenerations(errorData.totalGenerations || 0);
+        setDailyGenerations(errorData.dailyGenerations || 0);
+        setResetTime(errorData.resetTime || '');
         setShowUpgradeModal(true);
         return;
       }
-
       if (!response.ok) {
         throw new Error('Failed to merge PDFs');
       }
