@@ -19,8 +19,8 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
   maxFreeDailyMerges
 }) => {
   if (!isOpen) return null;
-
   const paypalOptions = {
+    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test',
     intent: "subscription",
     vault: true
   };
