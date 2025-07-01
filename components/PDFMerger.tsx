@@ -17,10 +17,10 @@ const PDFMerger = () => {
   const [dailyGenerations, setDailyGenerations] = useState(0);
   const [maxFreeDailyMerges] = useState(5);
   const [resetTime, setResetTime] = useState<string>('');
+  const [mergeProgress, setMergeProgress] = useState(0);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [mergedFileName, setMergedFileName] = useState<string>('merged.pdf');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = (selectedFiles: FileList | null) => {
-    if (!selectedFiles) return;
 
     const newFiles: UploadedFile[] = [];
     for (let i = 0; i < selectedFiles.length; i++) {
