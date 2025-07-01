@@ -9,8 +9,8 @@ const Navbar = () => {
         <div className={styles.logo}>
           <Image src="/favicon.ico" alt="PDFMerge Pro" width={32} height={32} className={styles.logoIcon} />
           <h2>PDFMerge Pro</h2>
+        </div>
         <div className={styles.authButtons}>
-          <SignedOut>
             <SignInButton>
               <button className={styles.signInBtn}>Sign In</button>
             </SignInButton>
