@@ -1,24 +1,25 @@
-Welcome to the NextJS base template bootstrapped using the `create-next-app`. This template supports TypeScript, but you can use normal JavaScript as well.
+# PDF Merger SaaS
 
-## Getting Started
+A modern, user-friendly PDF merging service built with Next.js, featuring a freemium model with daily usage limits.
 
-Hit the run button to start the development server.
+## Features
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Free Plan
+- **5 PDF merges per day** - Perfect for occasional users
+- Daily limit resets at midnight
+- Real-time usage tracking with progress bar
+- Drag & drop file upload
+- File reordering before merge
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on `/api/hello`. This endpoint can be edited in `pages/api/hello.ts`.
+### Pro Plan ($9/month)
+- Unlimited PDF merges
+- No file size limits
+- Priority support
+- API access
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Technical Implementation
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-## Productionizing your Next App
-
-To make your next App run smoothly in production make sure to deploy your project with [Repl Deployments](https://docs.replit.com/hosting/deployments/about-deployments)!
-
-You can also produce a production build by running `npm run build` and [changing the run command](https://docs.replit.com/programming-ide/configuring-repl#run) to `npm run start`.
+### Daily Limit System
+- Tracks daily usage per user with automatic reset at midnight
+- MongoDB storage for user data and usage statistics
+- Real-time progress visualization
