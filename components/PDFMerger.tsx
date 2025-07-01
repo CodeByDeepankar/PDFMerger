@@ -142,25 +142,25 @@ const PDFMerger = () => {
             )}
           </div>
 
-          {/* File List */}
-          {files.length > 0 && (
-            <div className={styles.fileList}>
-              <h3>Selected Files ({files.length})</h3>
-              {files.map((fileItem, index) => (
-                <div key={fileItem.id} className={styles.fileItem}>
-                  <div className={styles.fileInfo}>
-                    <span className={styles.fileName}>{fileItem.file.name}</span>
-                    <span className={styles.fileSize}>
-                      {(fileItem.file.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                  </div>
-                  <div className={styles.fileActions}>
-                    {index > 0 && (
-                      <button
-                        onClick={() => moveFile(index, index - 1)}
-                        className={styles.moveBtn}
-                      >
-                        ↑
+          {/* Upload Area */}
+          <div
+            className={styles.uploadArea}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <div className={styles.uploadIcon}>📄</div>
+            <h3>Drop PDF files here or click to browse</h3>
+            <p>Select multiple PDF files to merge them into one</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept=".pdf,application/pdf"
+              onChange={(e) => handleFileSelect(e.target.files)}
+              style={{ display: 'none' }}
+            />
+          </div>
                       </button>
                     )}
                     {index < files.length - 1 && (
