@@ -4,11 +4,20 @@ import PDFMerger from 'pdf-merger-js';
 import fs from 'fs';
 import path from 'path';
 import { getAuth } from '@clerk/nextjs/server';
-import { connectToDatabase, canUserMerge, incrementUserGenerations, getUserDailyGenerations, getUserGenerations, isUserPro } from '../../lib/mongodb';
+import { connectToDatabase } from '../../lib/mongodb';
 
 // Configure multer for file uploads
 const upload = multer({
-  dest: '/tmp/uploads/',
+  storage: multer.diskStorage({
+    destination: '/tmp/uploads',
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${file.originalname}`);
+    }
+  }),
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB per file
+    files: 10 // Maximum 10 files
+  },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {
       cb(null, true);
@@ -18,16 +27,8 @@ const upload = multer({
   }
 });
 
-const uploadMiddleware = upload.array('pdfs', 10); // Allow up to 10 files
-
-// Disable default body parser for file uploads
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-function runMiddleware(req: any, res: any, fn: any) {
+// Middleware to handle multipart/form-data
+const runMiddleware = (req: NextApiRequest, res: NextApiResponse, fn: any) => {
   return new Promise((resolve, reject) => {
     fn(req, res, (result: any) => {
       if (result instanceof Error) {
@@ -36,91 +37,139 @@ function runMiddleware(req: any, res: any, fn: any) {
       return resolve(result);
     });
   });
-}
+};
+
+export const config = {
+  api: {
+    bodyParser: false, // Disable default body parser
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).json({ 
+      error: 'Method not allowed',
+      message: 'Only POST requests are supported'
+    });
   }
 
   try {
-    // Get user authentication
+    // Authenticate user
     const { userId } = getAuth(req);
-    
     if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    // Check if user is pro
-    const isPro = await isUserPro(userId);
-    
-    // Check if user can merge PDFs
-    const canMerge = await canUserMerge(userId, isPro);
-    
-    if (!canMerge) {
-      const dailyGenerations = await getUserDailyGenerations(userId);
-      const totalGenerations = await getUserGenerations(userId);
-      return res.status(403).json({ 
-        error: 'Daily limit exceeded', 
-        message: 'You have used all 5 free merges for today. Please upgrade to Pro for unlimited merges or try again tomorrow.',
-        dailyGenerations,
-        totalGenerations,
-        maxFreeDailyMerges: 5,
-        resetTime: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
+      return res.status(401).json({ 
+        error: 'Unauthorized',
+        message: 'You must be signed in to merge PDFs'
       });
     }
 
-    // Run multer middleware
-    await runMiddleware(req, res, uploadMiddleware);
+    // Connect to database
+    const { db } = await connectToDatabase();
 
-    const files = (req as any).files;
-    
-    if (!files || files.length < 2) {
-      return res.status(400).json({ error: 'At least 2 PDF files are required' });
+    // Check user's merge limits
+    const user = await db.collection('users').findOne({ userId });
+    const isProUser = user?.subscriptionStatus === 'active';
+    const maxDailyMerges = isProUser ? Infinity : 5;
+
+    if (!isProUser && user?.dailyMerges >= maxDailyMerges) {
+      const resetTime = new Date();
+      resetTime.setHours(24, 0, 0, 0); // Midnight reset
+      
+      return res.status(429).json({
+        error: 'Daily limit exceeded',
+        message: `You've reached your ${maxDailyMerges} free merges for today`,
+        dailyLimitReached: true,
+        resetTime: resetTime.toISOString()
+      });
     }
 
-    // Initialize PDF merger
-    const merger = new PDFMerger();
+    // Process file upload
+    await runMiddleware(req, res, upload.array('files'));
 
-    // Add all PDF files to merger
+    const files = (req as any).files;
+    if (!files || files.length < 2) {
+      return res.status(400).json({
+        error: 'Invalid request',
+        message: 'At least 2 PDF files are required for merging'
+      });
+    }
+
+    // Verify total size doesn't exceed 100MB
+    const totalSize = files.reduce((sum: number, file: any) => sum + file.size, 0);
+    if (totalSize > 100 * 1024 * 1024) {
+      throw new Error('Total file size exceeds 100MB limit');
+    }
+
+    // Merge PDFs
+    const merger = new PDFMerger();
     for (const file of files) {
       await merger.add(file.path);
     }
 
-    // Generate output filename
-    const outputPath = path.join('/tmp', `merged-${Date.now()}.pdf`);
-    
-    // Save merged PDF
+    // Generate output file
+    const outputFileName = `merged-${Date.now()}.pdf`;
+    const outputPath = path.join('/tmp', outputFileName);
     await merger.save(outputPath);
 
     // Read the merged PDF
     const mergedPdf = fs.readFileSync(outputPath);
 
-    // Clean up uploaded files
+    // Update user's merge count
+    await db.collection('users').updateOne(
+      { userId },
+      {
+        $inc: { 
+          totalMerges: 1,
+          dailyMerges: 1 
+        },
+        $setOnInsert: {
+          createdAt: new Date()
+        }
+      },
+      { upsert: true }
+    );
+
+    // Clean up temporary files
     files.forEach((file: any) => {
-      if (fs.existsSync(file.path)) {
+      try {
         fs.unlinkSync(file.path);
+      } catch (err) {
+        console.error(`Error deleting temp file ${file.path}:`, err);
       }
     });
 
-    // Clean up merged file
-    if (fs.existsSync(outputPath)) {
-      fs.unlinkSync(outputPath);
-    }
+    fs.unlinkSync(outputPath);
 
-    // Increment user generations after successful merge
-    await incrementUserGenerations(userId);
-
-    // Send the merged PDF as response
+    // Return the merged PDF
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="merged.pdf"');
-    res.send(mergedPdf);
+    res.setHeader('Content-Disposition', `attachment; filename="${outputFileName}"`);
+    return res.send(mergedPdf);
 
   } catch (error) {
-    console.error('Error merging PDFs:', error);
-    res.status(500).json({ error: 'Failed to merge PDFs' });
+    console.error('PDF merge error:', error);
+
+    // Clean up any uploaded files if error occurred
+    if ((req as any).files) {
+      (req as any).files.forEach((file: any) => {
+        try {
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        } catch (err) {
+          console.error('Error cleaning up temp file:', err);
+        }
+      });
+    }
+
+    const errorMessage = error instanceof Error ? error.message : 'Failed to merge PDFs';
+    return res.status(500).json({
+      error: 'Merge failed',
+      message: errorMessage
+    });
   }
 }
