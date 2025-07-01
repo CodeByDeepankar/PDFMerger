@@ -1,4 +1,4 @@
-
+/* Header Styles */
 /* Header Styles */
 .header {
   background: rgba(255, 255, 255, 0.95);
@@ -16,17 +16,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoIcon {
+  border-radius: 4px;
 }
 
 .logo h2 {
-  color: #4F46E5;
-  margin: 0;
-  font-weight: 700;
-  font-size: 1.5rem;
-}
-
-.authButtons {
-  display: flex;
   align-items: center;
   gap: 1rem;
 }
