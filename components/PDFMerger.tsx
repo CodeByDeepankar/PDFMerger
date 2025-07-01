@@ -524,7 +524,7 @@ const PDFMerger = () => {
     </SignedIn>
 
     {/* Upgrade Modal */}
-    <showUpgradeModal
+    <UpgradeModal
       isOpen={showUpgradeModal}
       onClose={() => setShowUpgradeModal(false)}
       generations={userGenerations}
