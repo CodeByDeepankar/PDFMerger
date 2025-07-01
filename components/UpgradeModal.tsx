@@ -43,11 +43,11 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
           <div className={styles.pricing}>
             <h4>Upgrade to Pro - $9/month</h4>
             <ul>
+              <li>✓ Unlimited PDF merges</li>
               <li>✓ No file size limits</li>
               <li>✓ Priority support</li>
               <li>✓ API access</li>
             </ul>
-          </div>
 
           <div className={styles.actions}>
             <PayPalScriptProvider options={paypalOptions}>
