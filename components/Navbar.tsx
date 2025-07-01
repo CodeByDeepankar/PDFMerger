@@ -21,6 +21,7 @@ const Navbar = () => {
           </SignedIn>
         </div>
       </div>
+    </header>
   );
 };
 
