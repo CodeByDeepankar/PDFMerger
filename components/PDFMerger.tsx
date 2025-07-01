@@ -62,6 +62,21 @@ const PDFMerger = () => {
     e.preventDefault();
     setDragActive(false);
   };
+
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(f => f.id !== id));
+  };
+
+  const moveFile = (fromIndex: number, toIndex: number) => {
+    const newFiles = [...files];
+    const [movedFile] = newFiles.splice(fromIndex, 1);
+    newFiles.splice(toIndex, 0, movedFile);
+    setFiles(newFiles);
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('/api/user-data');
       if (response.ok) {
         const data = await response.json();
         setUserGenerations(data.totalGenerations || 0);
@@ -98,37 +113,22 @@ const PDFMerger = () => {
     setMergeProgress(0);
     setDownloadUrl(null);
 
-    // Simulate progress animation
+    // Enhanced progress animation with multiple stages
+    const progressStages = [
+      { progress: 15, delay: 300, message: 'Analyzing files...' },
+      { progress: 35, delay: 500, message: 'Processing PDFs...' },
+      { progress: 60, delay: 700, message: 'Merging documents...' },
+      { progress: 85, delay: 400, message: 'Finalizing...' },
+      { progress: 95, delay: 200, message: 'Almost done...' }
+    ];
+
+    let currentStage = 0;
     const progressInterval = setInterval(() => {
-      setMergeProgress(prev => {
-        if (prev >= 90) return prev;
-        return prev + Math.random() * 15;
-      });
-    }, 200);
-
-    try {
-      const formData = new FormData();
-      files.forEach((fileObj, index) => {
-        formData.append('files', fileObj.file);
-      });
-
-      const response = await fetch('/api/merge-pdfs', {
-        method: 'POST',
-        body: formData,
-      });
-
-      clearInterval(progressInterval);
-      setMergeProgress(100);
-
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        
-        // Generate filename with timestamp
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        const fileName = `merged-${timestamp}.pdf`;
-        setMergedFileName(fileName);
-        setDownloadUrl(url);
+      if (currentStage < progressStages.length) {
+        setMergeProgress(progressStages[currentStage].progress);
+        currentStage++;
+      }
+    }, 600);
         
         // Update user data after successful merge
         await fetchUserData();
