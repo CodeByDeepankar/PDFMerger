@@ -48,7 +48,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               <li>✓ Priority support</li>
               <li>✓ API access</li>
             </ul>
-
+          </div>
           <div className={styles.actions}>
             <PayPalScriptProvider options={paypalOptions}>
               <PayPalButtons
