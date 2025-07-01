@@ -244,98 +244,98 @@ const PDFMerger = () => {
           </div>
         </div>
       </SignedOut>
-                  <span>{fileObj.file.name}</span>
-                  <span className={styles.fileSize}>
-                    ({(fileObj.file.size / 1024 / 1024).toFixed(2)} MB)
-                  </span>
-                </div>
-                <div className={styles.fileActions}>
-                  {index > 0 && (
-                    <button 
-                      onClick={() => moveFile(index, index - 1)}
-                      className={styles.moveButton}
-                    >
-                      ↑
-                    </button>
-                  )}
-                  {index < files.length - 1 && (
-                    <button 
-                      onClick={() => moveFile(index, index + 1)}
-                      className={styles.moveButton}
-                    >
-                      ↓
-                    </button>
-                  )}
-                  <button 
-                    onClick={() => removeFile(fileObj.id)}
-                    className={styles.removeButton}
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
 
-        {files.length >= 2 && (
-          <div className={styles.mergeSection}>
-            {/* Progress Bar */}
-            {isMerging && (
-              <div className={styles.progressContainer}>
-                <div className={styles.progressLabel}>Merging PDFs... {Math.round(mergeProgress)}%</div>
-                <div className={styles.progressBar}>
+      <SignedIn>
+        <div className={styles.dashboard}>
+          {/* Header Section */}
+          <div className={styles.dashboardHeader}>
+            <div className={styles.headerContent}>
+              <h1 className={styles.dashboardTitle}>PDF Merger Dashboard</h1>
+              <p className={styles.dashboardSubtitle}>Merge, organize, and download your PDF files with ease</p>
+            </div>
+          </div>
+
+          {/* Usage Stats Card */}
+          <div className={styles.statsCard}>
+            <div className={styles.statsHeader}>
+              <h3>Usage Statistics</h3>
+              <div className={styles.statsIcon}>📊</div>
+            </div>
+            <div className={styles.statsGrid}>
+              <div className={styles.statItem}>
+                <div className={styles.statValue}>{dailyGenerations}</div>
+                <div className={styles.statLabel}>Today's Merges</div>
+                <div className={styles.statProgress}>
                   <div 
-                    className={styles.progressFill}
-                    style={{ width: `${mergeProgress}%` }}
+                    className={styles.statProgressFill}
+                    style={{ width: `${(dailyGenerations / maxFreeDailyMerges) * 100}%` }}
                   ></div>
                 </div>
+                <div className={styles.statLimit}>of {maxFreeDailyMerges} free daily</div>
               </div>
-            )}
-
-            {/* Download Section */}
-            {downloadUrl && (
-              <div className={styles.downloadSection}>
-                <div className={styles.successMessage}>
-                  <i className="ri-check-circle-line"></i>
-                  <span>PDF merged successfully!</span>
-                </div>
-                <div className={styles.downloadActions}>
-                  <button 
-                    className={styles.downloadButton}
-                    onClick={downloadMergedPDF}
-                  >
-                    <i className="ri-download-line"></i>
-                    Download {mergedFileName}
-                  </button>
-                  <button 
-                    className={styles.clearButton}
-                    onClick={clearMergedFile}
-                  >
-                    <i className="ri-refresh-line"></i>
-                    Merge New Files
-                  </button>
-                </div>
+              <div className={styles.statItem}>
+                <div className={styles.statValue}>{userGenerations}</div>
+                <div className={styles.statLabel}>Total Merges</div>
               </div>
-            )}
-
-            {/* Merge Button */}
-            {!downloadUrl && (
-              <button 
-                className={styles.mergeButton}
-                onClick={mergePDFs}
-                disabled={isMerging || dailyGenerations >= maxFreeDailyMerges}
-              >
-                {isMerging ? 'Merging...' : 'Merge PDFs'}
-              </button>
-            )}
+              <div className={styles.statItem}>
+                <div className={styles.statValue}>{resetTime}</div>
+                <div className={styles.statLabel}>Resets At</div>
+              </div>
+            </div>
             {dailyGenerations >= maxFreeDailyMerges && (
-              <p className={styles.upgradePrompt}>
-                Daily limit reached. <button onClick={() => setShowUpgradeModal(true)}>Upgrade to Pro</button> for unlimited merges.
-              </p>
+              <div className={styles.limitWarning}>
+                <div className={styles.warningIcon}>⚠️</div>
+                <div>
+                  <div className={styles.warningTitle}>Daily Limit Reached</div>
+                  <div className={styles.warningText}>Upgrade to Pro for unlimited merges</div>
+                </div>
+                <button 
+                  className={styles.upgradeBtn}
+                  onClick={() => setShowUpgradeModal(true)}
+                >
+                  Upgrade Now
+                </button>
+              </div>
             )}
           </div>
-        )}
+
+          {/* Upload Section */}
+          <div className={`${styles.uploadSection} ${dragActive ? styles.dragActive : ''}`}>
+            <div 
+              className={styles.uploadArea}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className={styles.uploadContent}>
+                {isUploading ? (
+                  <div className={styles.uploadingState}>
+                    <div className={styles.spinner}></div>
+                    <h3>Processing Files...</h3>
+                    <p>Please wait while we analyze your PDFs</p>
+                  </div>
+                ) : (
+                  <div className={styles.uploadPrompt}>
+                    <div className={styles.uploadIcon}>📁</div>
+                    <h3>Drop PDF files here or click to browse</h3>
+                    <p>Support for multiple files • Maximum 50MB per file</p>
+                    <div className={styles.uploadButton}>
+                      <span>Choose Files</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept=".pdf"
+                onChange={(e) => handleFileSelect(e.target.files)}
+                style={{ display: 'none' }}
+              />
+            </div>
+          </div>
       </SignedIn>
 
       <UpgradeModal
