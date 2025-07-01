@@ -121,25 +121,25 @@ const PDFMerger = () => {
       <SignedIn>
         <div className={styles.mergerSection}>
           <h2>PDF Merger</h2>
-
-          {/* Upload Area */}
-          <div
-            className={styles.uploadArea}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className={styles.uploadIcon}>📄</div>
-            <h3>Drop PDF files here or click to browse</h3>
-            <p>Select multiple PDF files to merge them into one</p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".pdf,application/pdf"
-              onChange={(e) => handleFileSelect(e.target.files)}
-              style={{ display: 'none' }}
-            />
+          
+          {/* Daily Usage Stats */}
+          <div className={styles.usageStats}>
+            <div className={styles.usageInfo}>
+              <span className={styles.usageText}>
+                Daily merges: {dailyGenerations}/{maxFreeDailyMerges}
+              </span>
+              <div className={styles.progressBar}>
+                <div 
+                  className={styles.progressFill}
+                  style={{ width: `${(dailyGenerations / maxFreeDailyMerges) * 100}%` }}
+                />
+              </div>
+            </div>
+            {dailyGenerations >= maxFreeDailyMerges && (
+              <p className={styles.limitReached}>
+                Daily limit reached! Resets at midnight or upgrade to Pro for unlimited merges.
+              </p>
+            )}
           </div>
 
           {/* File List */}
