@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import PDFMerger from 'pdf-merger-js';
 import fs from 'fs';
-import path from 'path';
+import { connectToDatabase, canUserMerge, incrementUserGenerations, getUserDailyGenerations, isUserPro } from '../../lib/mongodb';
 import { getAuth } from '@clerk/nextjs/server';
 import { connectToDatabase, canUserMerge, incrementUserGenerations, getUserGenerations } from '../../lib/mongodb';
 
@@ -47,24 +47,24 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    // Get user authentication
-    const { userId } = getAuth(req);
+    // Check if user is pro
+    const isPro = await isUserPro(userId);
     
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    // Check if user can merge PDFs (assuming free tier for now)
-    const canMerge = await canUserMerge(userId, false);
+    // Check if user can merge PDFs
+    const canMerge = await canUserMerge(userId, isPro);
     
     if (!canMerge) {
-      const generations = await getUserGenerations(userId);
+      const dailyGenerations = await getUserDailyGenerations(userId);
+      const totalGenerations = await getUserGenerations(userId);
       return res.status(403).json({ 
-        error: 'Free tier limit exceeded', 
-        message: 'You have used your free generation. Please upgrade to Pro for unlimited merges.',
-        generations,
-        maxFreeGenerations: 1
+        error: 'Daily limit exceeded', 
+        message: 'You have used all 5 free merges for today. Please upgrade to Pro for unlimited merges or try again tomorrow.',
+        dailyGenerations,
+        totalGenerations,
+        maxFreeDailyMerges: 5,
+        resetTime: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
+      });
+    }
       });
     }
 
