@@ -73,15 +73,15 @@ export default async function handler(
         resetTime: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
       });
     }
+
+    // Run multer middleware
+    await runMiddleware(req, res, uploadMiddleware);
+
+    const files = (req as any).files;
+    
     if (!files || files.length < 2) {
       return res.status(400).json({ error: 'At least 2 PDF files are required' });
     }
-
-    // Create merger instance
-    const merger = new PDFMerger();
-
-    // Add all uploaded PDFs to merger
-    for (const file of files) {
       await merger.add(file.path);
     }
 
