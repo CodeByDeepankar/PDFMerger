@@ -18,6 +18,8 @@ const PDFMerger = () => {
   const [maxFreeDailyMerges] = useState(5);
   const [resetTime, setResetTime] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
 
     const newFiles: UploadedFile[] = [];
@@ -28,8 +30,6 @@ const PDFMerger = () => {
           file,
           id: `${Date.now()}-${i}`
         });
-      }
-    }
     setFiles(prev => [...prev, ...newFiles]);
   };
 
