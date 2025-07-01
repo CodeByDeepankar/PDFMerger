@@ -200,9 +200,9 @@ const PDFMerger = () => {
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         generations={userGenerations}
-        maxFreeGenerations={maxFreeGenerations}
+        dailyGenerations={dailyGenerations}
+        maxFreeDailyMerges={maxFreeDailyMerges}
       />
-    </div>
   );
 };
 
