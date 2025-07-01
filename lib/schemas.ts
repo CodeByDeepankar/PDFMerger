@@ -10,9 +10,9 @@ export interface User {
   billingCycleAnchor?: Date;
   nextBillingDate?: Date;
   createdAt: Date;
-  updatedAt: Date;
   generations: number;
-}
+  dailyGenerations?: number;
+  lastUsed?: Date;
 
 export interface Plan {
   _id?: string;
