@@ -1,5 +1,5 @@
 const mergePDFs = async () => {
-  if (files.length < 2) {
+  if (file.length < 2) {
     alert('Please select at least 2 PDF files to merge.');
     return;
   }
