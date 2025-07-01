@@ -692,5 +692,119 @@
   border-radius: 8px;
 }
 
+/* Modal Stats Styles */
 .statValue {
- 
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3498db;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  display: block;
+}
+
+.modalText {
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modalPrimaryButton {
+  flex: 1;
+  background: linear-gradient(90deg, #3498db, #9b59b6);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.modalPrimaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.modalPrimaryButton:active {
+  transform: translateY(0);
+}
+
+.modalSecondaryButton {
+  flex: 1;
+  background: white;
+  color: #2c3e50;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalSecondaryButton:hover {
+  background: #f8f9fa;
+  border-color: #d0d0d0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .modalStats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .modalStat {
+    padding: 0.75rem;
+  }
+  
+  .statValue {
+    font-size: 1.25rem;
+  }
+  
+  .modalActions {
+    flex-direction: column;
+  }
+  
+  .modalPrimaryButton,
+  .modalSecondaryButton {
+    width: 100%;
+  }
+}
+
+/* Animation for modal entrance */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalContent {
+  animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+/* Backdrop overlay */
+.modalOverlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+}
