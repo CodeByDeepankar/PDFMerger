@@ -7,17 +7,17 @@ interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   generations: number;
-  maxFreeGenerations: number;
+  dailyGenerations: number;
+  maxFreeDailyMerges: number;
 }
 
 const UpgradeModal: React.FC<UpgradeModalProps> = ({
   isOpen,
   onClose,
   generations,
-  maxFreeGenerations
+  dailyGenerations,
+  maxFreeDailyMerges
 }) => {
-  if (!isOpen) return null;
-
   const paypalOptions = {
     clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID  as string,
     components: "buttons",
@@ -35,11 +35,11 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
         
         <div className={styles.content}>
           <div className={styles.limit}>
-            <h3>Free Tier Limit Reached</h3>
-            <p>You have used {generations} out of {maxFreeGenerations} free merges.</p>
+            <h3>Daily Limit Reached</h3>
+            <p>You have used {dailyGenerations} out of {maxFreeDailyMerges} free merges today.</p>
+            <p className={styles.resetInfo}>Your daily limit resets at midnight.</p>
+            <p className={styles.totalInfo}>Total merges: {generations}</p>
           </div>
-
-          <div className={styles.pricing}>
             <h4>Upgrade to Pro - $9/month</h4>
             <ul>
               <li>✓ Unlimited PDF merges</li>
