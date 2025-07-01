@@ -20,12 +20,15 @@ const PDFMerger = () => {
   const [mergeProgress, setMergeProgress] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [mergedFileName, setMergedFileName] = useState<string>('merged.pdf');
+  const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
 
+    setIsUploading(true);
     const newFiles: UploadedFile[] = [];
+    
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
       if (file.type === 'application/pdf') {
@@ -35,33 +38,30 @@ const PDFMerger = () => {
         });
       }
     }
-    setFiles(prev => [...prev, ...newFiles]);
+    
+    // Simulate upload animation
+    setTimeout(() => {
+      setFiles(prev => [...prev, ...newFiles]);
+      setIsUploading(false);
+    }, 800);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setDragActive(false);
     const droppedFiles = e.dataTransfer.files;
     handleFileSelect(droppedFiles);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setDragActive(true);
   };
 
-  const removeFile = (id: string) => {
-    setFiles(prev => prev.filter(f => f.id !== id));
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
   };
-
-  const moveFile = (fromIndex: number, toIndex: number) => {
-    const newFiles = [...files];
-    const [movedFile] = newFiles.splice(fromIndex, 1);
-    newFiles.splice(toIndex, 0, movedFile);
-    setFiles(newFiles);
-  };
-
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('/api/user-data');
       if (response.ok) {
         const data = await response.json();
         setUserGenerations(data.totalGenerations || 0);
