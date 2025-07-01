@@ -81,6 +81,12 @@ export default async function handler(
     if (!files || files.length < 2) {
       return res.status(400).json({ error: 'At least 2 PDF files are required' });
     }
+
+    // Initialize PDF merger
+    const merger = new PDFMerger();
+
+    // Add all PDF files to merger
+    for (const file of files) {
       await merger.add(file.path);
     }
 
