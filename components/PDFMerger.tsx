@@ -9,6 +9,7 @@ interface UploadedFile {
 }
 
 const PDFMerger = () => {
+  // State management
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
@@ -21,36 +22,54 @@ const PDFMerger = () => {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [mergedFileName, setMergedFileName] = useState<string>('merged.pdf');
   const [dragActive, setDragActive] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Handle file selection
   const handleFileSelect = (selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
 
     setIsUploading(true);
+    setErrorMessage(null);
     const newFiles: UploadedFile[] = [];
     
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      if (file.type === 'application/pdf') {
+    try {
+      // Validate each file
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        
+        // Check file type
+        if (file.type !== 'application/pdf') {
+          throw new Error('Only PDF files are allowed');
+        }
+        
+        // Check file size (50MB limit)
+        if (file.size > 50 * 1024 * 1024) {
+          throw new Error('File size exceeds 50MB limit');
+        }
+        
         newFiles.push({
           file,
           id: `${Date.now()}-${i}`
         });
       }
-    }
-    
-    // Simulate upload animation
-    setTimeout(() => {
-      setFiles(prev => [...prev, ...newFiles]);
+      
+      // Simulate upload processing
+      setTimeout(() => {
+        setFiles(prev => [...prev, ...newFiles]);
+        setIsUploading(false);
+      }, 800);
+    } catch (error) {
       setIsUploading(false);
-    }, 800);
+      setErrorMessage(error instanceof Error ? error.message : 'Invalid file selected');
+    }
   };
 
+  // Drag and drop handlers
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    const droppedFiles = e.dataTransfer.files;
-    handleFileSelect(droppedFiles);
+    handleFileSelect(e.dataTransfer.files);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -63,6 +82,7 @@ const PDFMerger = () => {
     setDragActive(false);
   };
 
+  // File management
   const removeFile = (id: string) => {
     setFiles(prev => prev.filter(f => f.id !== id));
   };
@@ -74,6 +94,7 @@ const PDFMerger = () => {
     setFiles(newFiles);
   };
 
+  // Fetch user data
   const fetchUserData = async () => {
     try {
       const response = await fetch('/api/user-data');
@@ -86,7 +107,10 @@ const PDFMerger = () => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(0, 0, 0, 0);
-        setResetTime(tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        setResetTime(tomorrow.toLocaleTimeString([], { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }));
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -97,31 +121,35 @@ const PDFMerger = () => {
     fetchUserData();
   }, []);
 
+  // PDF merging function
   const mergePDFs = async () => {
+    // Validation checks
     if (files.length < 2) {
-      alert('Please select at least 2 PDF files to merge.');
+      setErrorMessage('Please select at least 2 PDF files to merge.');
       return;
     }
 
-    // Check daily limit for free users
     if (dailyGenerations >= maxFreeDailyMerges) {
       setShowUpgradeModal(true);
       return;
     }
 
+    // Setup merge state
     setIsMerging(true);
     setMergeProgress(0);
     setDownloadUrl(null);
+    setErrorMessage(null);
 
-    // Enhanced progress animation with multiple stages
+    // Progress stages
     const progressStages = [
-      { progress: 15, delay: 300, message: 'Analyzing files...' },
-      { progress: 35, delay: 500, message: 'Processing PDFs...' },
-      { progress: 60, delay: 700, message: 'Merging documents...' },
-      { progress: 85, delay: 400, message: 'Finalizing...' },
-      { progress: 95, delay: 200, message: 'Almost done...' }
+      { progress: 15, message: 'Analyzing files...' },
+      { progress: 35, message: 'Processing PDFs...' },
+      { progress: 60, message: 'Merging documents...' },
+      { progress: 85, message: 'Finalizing...' },
+      { progress: 95, message: 'Almost done...' }
     ];
 
+    // Progress animation
     let currentStage = 0;
     const progressInterval = setInterval(() => {
       if (currentStage < progressStages.length) {
@@ -131,61 +159,86 @@ const PDFMerger = () => {
     }, 600);
 
     try {
+      // Prepare form data
       const formData = new FormData();
-      files.forEach((fileObj, index) => {
+      const totalSize = files.reduce((sum, fileObj) => sum + fileObj.file.size, 0);
+      
+      // Check total size
+      if (totalSize > 50 * 1024 * 1024) {
+        throw new Error('Total file size exceeds 50MB limit');
+      }
+
+      // Add files to form data
+      files.forEach((fileObj) => {
         formData.append('files', fileObj.file);
       });
 
+      // Send merge request
       const response = await fetch('/api/merge-pdfs', {
         method: 'POST',
         body: formData,
       });
 
-      // Ensure progress reaches 100% before handling response
+      // Complete progress animation
       setMergeProgress(100);
-      await new Promise(resolve => setTimeout(resolve, 300)); // Small delay for smooth UX
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        
-        // Generate filename with timestamp
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        const fileName = `merged-${timestamp}.pdf`;
-        setMergedFileName(fileName);
-        setDownloadUrl(url);
-        
-        // Update user data after successful merge
-        await fetchUserData();
-      } else {
-        const errorData = await response.json();
+      // Handle response
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
         if (errorData.dailyLimitReached) {
           setShowUpgradeModal(true);
-        } else {
-          throw new Error(errorData.error || 'Failed to merge PDFs');
+          return;
         }
+        throw new Error(errorData.message || 'Server error during merge');
       }
+
+      // Process the merged PDF
+      const blob = await response.blob();
+      
+      if (blob.type !== 'application/pdf') {
+        throw new Error('Invalid PDF file received from server');
+      }
+
+      // Create download URL
+      const url = window.URL.createObjectURL(blob);
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const fileName = `merged-${timestamp}.pdf`;
+      
+      // Update state
+      setMergedFileName(fileName);
+      setDownloadUrl(url);
+      await fetchUserData();
+
     } catch (error) {
-      console.error('Error merging PDFs:', error);
-      alert(error instanceof Error ? error.message : 'An error occurred while merging PDFs');
+      console.error('Merge error:', error);
+      setErrorMessage(
+        error instanceof Error ? 
+        error.message : 
+        'Failed to merge PDFs. Please try again.'
+      );
     } finally {
       clearInterval(progressInterval);
       setIsMerging(false);
     }
   };
 
+  // Download handler
   const downloadMergedPDF = () => {
     if (downloadUrl) {
       const a = document.createElement('a');
-      a.style.display = 'none';
       a.href = downloadUrl;
       a.download = mergedFileName;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+      }, 100);
     }
   };
 
+  // Reset handler
   const clearMergedFile = () => {
     if (downloadUrl) {
       window.URL.revokeObjectURL(downloadUrl);
@@ -194,10 +247,12 @@ const PDFMerger = () => {
     setMergedFileName('merged.pdf');
     setMergeProgress(0);
     setFiles([]);
+    setErrorMessage(null);
   };
 
   return (
     <div className={styles.container}>
+      {/* Public landing page for signed out users */}
       <SignedOut>
         <div className={styles.heroSection}>
           <div className={styles.heroContent}>
@@ -207,7 +262,8 @@ const PDFMerger = () => {
                 <span className={styles.gradient}> Professional Ease</span>
               </h1>
               <p className={styles.heroSubtitle}>
-                Combine multiple PDF files into one document with our advanced, secure, and lightning-fast merger tool.
+                Combine multiple PDF files into one document with our advanced, 
+                secure, and lightning-fast merger tool.
               </p>
               <div className={styles.heroFeatures}>
                 <div className={styles.feature}>
@@ -238,22 +294,27 @@ const PDFMerger = () => {
                 <div className={styles.buttonShine}></div>
               </button>
             </SignInButton>
-            <p className={styles.ctaSubtext}>No credit card required • 5 free merges daily</p>
+            <p className={styles.ctaSubtext}>
+              No credit card required • 5 free merges daily
+            </p>
           </div>
         </div>
       </SignedOut>
 
+      {/* Application dashboard for signed in users */}
       <SignedIn>
         <div className={styles.dashboard}>
-          {/* Header Section */}
+          {/* Dashboard Header */}
           <div className={styles.dashboardHeader}>
             <div className={styles.headerContent}>
               <h1 className={styles.dashboardTitle}>PDF Merger Dashboard</h1>
-              <p className={styles.dashboardSubtitle}>Merge, organize, and download your PDF files with ease</p>
+              <p className={styles.dashboardSubtitle}>
+                Merge, organize, and download your PDF files with ease
+              </p>
             </div>
           </div>
 
-          {/* Usage Stats Card */}
+          {/* Usage Statistics */}
           <div className={styles.statsCard}>
             <div className={styles.statsHeader}>
               <h3>Usage Statistics</h3>
@@ -266,10 +327,14 @@ const PDFMerger = () => {
                 <div className={styles.statProgress}>
                   <div 
                     className={styles.statProgressFill}
-                    style={{ width: `${(dailyGenerations / maxFreeDailyMerges) * 100}%` }}
+                    style={{ 
+                      width: `${(dailyGenerations / maxFreeDailyMerges) * 100}%` 
+                    }}
                   ></div>
                 </div>
-                <div className={styles.statLimit}>of {maxFreeDailyMerges} free daily</div>
+                <div className={styles.statLimit}>
+                  of {maxFreeDailyMerges} free daily
+                </div>
               </div>
               <div className={styles.statItem}>
                 <div className={styles.statValue}>{userGenerations}</div>
@@ -285,7 +350,9 @@ const PDFMerger = () => {
                 <div className={styles.warningIcon}>⚠️</div>
                 <div>
                   <div className={styles.warningTitle}>Daily Limit Reached</div>
-                  <div className={styles.warningText}>Upgrade to Pro for unlimited merges</div>
+                  <div className={styles.warningText}>
+                    Upgrade to Pro for unlimited merges
+                  </div>
                 </div>
                 <button 
                   className={styles.upgradeBtn}
@@ -297,7 +364,21 @@ const PDFMerger = () => {
             )}
           </div>
 
-          {/* Upload Section */}
+          {/* Error Display */}
+          {errorMessage && (
+            <div className={styles.errorCard}>
+              <div className={styles.errorIcon}>❌</div>
+              <div className={styles.errorText}>{errorMessage}</div>
+              <button
+                className={styles.errorDismiss}
+                onClick={() => setErrorMessage(null)}
+              >
+                &times;
+              </button>
+            </div>
+          )}
+
+          {/* File Upload Area */}
           <div className={`${styles.uploadSection} ${dragActive ? styles.dragActive : ''}`}>
             <div 
               className={styles.uploadArea}
@@ -393,12 +474,14 @@ const PDFMerger = () => {
           {/* Merge Section */}
           {files.length >= 2 && (
             <div className={styles.mergeCard}>
-              {/* Progress Section */}
+              {/* Progress Indicator */}
               {isMerging && (
                 <div className={styles.progressSection}>
                   <div className={styles.progressHeader}>
                     <h3>Merging Your PDFs</h3>
-                    <div className={styles.progressPercent}>{Math.round(mergeProgress)}%</div>
+                    <div className={styles.progressPercent}>
+                      {Math.round(mergeProgress)}%
+                    </div>
                   </div>
                   <div className={styles.progressBar}>
                     <div 
@@ -407,7 +490,10 @@ const PDFMerger = () => {
                     ></div>
                   </div>
                   <div className={styles.progressMessage}>
-                    {mergeProgress < 100 ? 'Processing your documents...' : 'Finalizing merge...'}
+                    {mergeProgress < 100 ? 
+                      'Processing your documents...' : 
+                      'Finalizing merge...'
+                    }
                   </div>
                 </div>
               )}
@@ -447,7 +533,10 @@ const PDFMerger = () => {
                     onClick={mergePDFs}
                     disabled={dailyGenerations >= maxFreeDailyMerges}
                   >
-                    {dailyGenerations >= maxFreeDailyMerges ? 'Daily Limit Reached' : '🔗 Merge PDFs'}
+                    {dailyGenerations >= maxFreeDailyMerges ? 
+                      'Daily Limit Reached' : 
+                      '🔗 Merge PDFs'
+                    }
                   </button>
                   <p className={styles.mergeInfo}>
                     Merging {files.length} files into one document
@@ -459,6 +548,7 @@ const PDFMerger = () => {
         </div>
       </SignedIn>
 
+      {/* Upgrade Modal */}
       <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
