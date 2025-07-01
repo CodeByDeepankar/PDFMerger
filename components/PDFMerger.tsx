@@ -34,12 +34,12 @@ const PDFMerger = () => {
     }
     setFiles(prev => [...prev, ...newFiles]);
   };
+
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const droppedFiles = e.dataTransfer.files;
     handleFileSelect(droppedFiles);
   };
-
-  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
