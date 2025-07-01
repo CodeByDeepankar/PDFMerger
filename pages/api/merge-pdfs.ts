@@ -3,9 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import PDFMerger from 'pdf-merger-js';
 import fs from 'fs';
-import { connectToDatabase, canUserMerge, incrementUserGenerations, getUserDailyGenerations, isUserPro } from '../../lib/mongodb';
+import path from 'path';
 import { getAuth } from '@clerk/nextjs/server';
-import { connectToDatabase, canUserMerge, incrementUserGenerations, getUserGenerations } from '../../lib/mongodb';
+import { connectToDatabase, canUserMerge, incrementUserGenerations, getUserDailyGenerations, getUserGenerations, isUserPro } from '../../lib/mongodb';
 
 // Configure multer for file uploads
 const upload = multer({
