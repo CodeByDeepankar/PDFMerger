@@ -242,31 +242,31 @@ const PDFMerger = () => {
 
         {files.length >= 2 && (
           <div className={styles.mergeSection}>
-            <button 
-              className={styles.mergeButton}
-              onClick={mergePDFs}
-              disabled={isMerging || dailyGenerations >= maxFreeDailyMerges}
-            >
-              {isMerging ? 'Merging...' : 'Merge PDFs'}
-            </button>
-            {dailyGenerations >= maxFreeDailyMerges && (
-              <p className={styles.upgradePrompt}>
-                Daily limit reached. <button onClick={() => setShowUpgradeModal(true)}>Upgrade to Pro</button> for unlimited merges.
-              </p>
+            {/* Progress Bar */}
+            {isMerging && (
+              <div className={styles.progressContainer}>
+                <div className={styles.progressLabel}>Merging PDFs... {Math.round(mergeProgress)}%</div>
+                <div className={styles.progressBar}>
+                  <div 
+                    className={styles.progressFill}
+                    style={{ width: `${mergeProgress}%` }}
+                  ></div>
+                </div>
+              </div>
             )}
-          </div>
-        )}
-      </SignedIn>
 
-      <UpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        generations={userGenerations}
-        dailyGenerations={dailyGenerations}
-        maxFreeDailyMerges={maxFreeDailyMerges}
-      />
-    </div>
-  );
-};
-
-export default PDFMerger;
+            {/* Download Section */}
+            {downloadUrl && (
+              <div className={styles.downloadSection}>
+                <div className={styles.successMessage}>
+                  <i className="ri-check-circle-line"></i>
+                  <span>PDF merged successfully!</span>
+                </div>
+                <div className={styles.downloadActions}>
+                  <button 
+                    className={styles.downloadButton}
+                    onClick={downloadMergedPDF}
+                  >
+                    <i className="ri-download-line"></i>
+                    Download {mergedFileName}
+                  </button>
