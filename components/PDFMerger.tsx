@@ -92,6 +92,16 @@ const PDFMerger = () => {
     }
 
     setIsMerging(true);
+    setMergeProgress(0);
+    setDownloadUrl(null);
+
+    // Simulate progress animation
+    const progressInterval = setInterval(() => {
+      setMergeProgress(prev => {
+        if (prev >= 90) return prev;
+        return prev + Math.random() * 15;
+      });
+    }, 200);
 
     try {
       const formData = new FormData();
@@ -104,23 +114,24 @@ const PDFMerger = () => {
         body: formData,
       });
 
+      clearInterval(progressInterval);
+      setMergeProgress(100);
+
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'merged.pdf';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+        
+        // Generate filename with timestamp
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        const fileName = `merged-${timestamp}.pdf`;
+        setMergedFileName(fileName);
+        setDownloadUrl(url);
         
         // Update user data after successful merge
         await fetchUserData();
-        
-        // Clear files after successful merge
-        setFiles([]);
       } else {
+        clearInterval(progressInterval);
+        setMergeProgress(0);
         const errorData = await response.json();
         if (errorData.dailyLimitReached) {
           setShowUpgradeModal(true);
@@ -129,25 +140,14 @@ const PDFMerger = () => {
         }
       }
     } catch (error) {
+      clearInterval(progressInterval);
+      setMergeProgress(0);
       console.error('Error merging PDFs:', error);
       alert('An error occurred while merging PDFs');
     } finally {
       setIsMerging(false);
     }
   };
-
-  return (
-    <div className={styles.container}>
-      <SignedOut>
-        <div className={styles.signInPrompt}>
-          <h2>Sign in to merge PDFs</h2>
-          <p>Please sign in to access the PDF merger tool.</p>
-          <SignInButton mode="modal">
-            <button className={styles.signInButton}>Sign In</button>
-          </SignInButton>
-        </div>
-      </SignedOut>
-
       <SignedIn>
         <div className={styles.header}>
           <h1>PDF Merger</h1>
