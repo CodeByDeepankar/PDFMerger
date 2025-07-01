@@ -40,7 +40,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
             <p className={styles.resetInfo}>Your daily limit resets at midnight.</p>
             <p className={styles.totalInfo}>Total merges: {generations}</p>
           </div>
-            <h4>Upgrade to Pro - $9/month</h4>
+          <div className={styles.pricing}>
             <ul>
               <li>✓ Unlimited PDF merges</li>
               <li>✓ No file size limits</li>
