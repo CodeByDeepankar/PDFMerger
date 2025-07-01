@@ -68,11 +68,11 @@ export default async function handler(
         error: 'Daily limit exceeded', 
         message: 'You have used all 5 free merges for today. Please upgrade to Pro for unlimited merges or try again tomorrow.',
         dailyGenerations,
-    // Run multer middleware
-    await runMiddleware(req, res, uploadMiddleware);
-
-    const files = (req as any).files;
-    
+        totalGenerations,
+        maxFreeDailyMerges: 5,
+        resetTime: new Date(new Date().setHours(24, 0, 0, 0)).toISOString()
+      });
+    }
     if (!files || files.length < 2) {
       return res.status(400).json({ error: 'At least 2 PDF files are required' });
     }
