@@ -148,28 +148,28 @@ const PDFMerger = () => {
       setIsMerging(false);
     }
   };
-      <SignedIn>
-        <div className={styles.header}>
-          <h1>PDF Merger</h1>
-          <p>Merge multiple PDF files into one document</p>
-        </div>
 
-        {/* Usage Stats */}
-        <div className={styles.usageStats}>
-          <div className={styles.usageInfo}>
-            <h3>Daily merges: {dailyGenerations}/{maxFreeDailyMerges}</h3>
-            <div className={styles.progressBar}>
-              <div 
-                className={styles.progressFill} 
-                style={{ width: `${(dailyGenerations / maxFreeDailyMerges) * 100}%` }}
-              ></div>
-            </div>
-            {dailyGenerations >= maxFreeDailyMerges ? (
-              <p className={styles.limitReached}>Daily limit reached! Resets at midnight.</p>
-            ) : (
-              <p className={styles.resetInfo}>Resets at midnight ({resetTime})</p>
-            )}
-            <p className={styles.totalInfo}>Total merges: {userGenerations}</p>
+  const downloadMergedPDF = () => {
+    if (downloadUrl) {
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = downloadUrl;
+      a.download = mergedFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  const clearMergedFile = () => {
+    if (downloadUrl) {
+      window.URL.revokeObjectURL(downloadUrl);
+    }
+    setDownloadUrl(null);
+    setMergedFileName('merged.pdf');
+    setMergeProgress(0);
+    setFiles([]);
+  };
           </div>
         </div>
 
