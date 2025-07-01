@@ -129,6 +129,30 @@ const PDFMerger = () => {
         currentStage++;
       }
     }, 600);
+
+    try {
+      const formData = new FormData();
+      files.forEach((fileObj, index) => {
+        formData.append('files', fileObj.file);
+      });
+
+      const response = await fetch('/api/merge-pdfs', {
+        method: 'POST',
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+      setMergeProgress(100);
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        // Generate filename with timestamp
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        const fileName = `merged-${timestamp}.pdf`;
+        setMergedFileName(fileName);
+        setDownloadUrl(url);
         
         // Update user data after successful merge
         await fetchUserData();
@@ -177,73 +201,49 @@ const PDFMerger = () => {
   return (
     <div className={styles.container}>
       <SignedOut>
-        <div className={styles.signInPrompt}>
-          <h2>Sign in to merge PDFs</h2>
-          <p>Please sign in to access the PDF merger tool.</p>
-          <SignInButton mode="modal">
-            <button className={styles.signInButton}>Sign In</button>
-          </SignInButton>
+        <div className={styles.heroSection}>
+          <div className={styles.heroContent}>
+            <div className={styles.heroText}>
+              <h1 className={styles.heroTitle}>
+                Merge PDFs with
+                <span className={styles.gradient}> Professional Ease</span>
+              </h1>
+              <p className={styles.heroSubtitle}>
+                Combine multiple PDF files into one document with our advanced, secure, and lightning-fast merger tool.
+              </p>
+              <div className={styles.heroFeatures}>
+                <div className={styles.feature}>
+                  <div className={styles.featureIcon}>⚡</div>
+                  <span>Lightning Fast</span>
+                </div>
+                <div className={styles.feature}>
+                  <div className={styles.featureIcon}>🔒</div>
+                  <span>100% Secure</span>
+                </div>
+                <div className={styles.feature}>
+                  <div className={styles.featureIcon}>🎯</div>
+                  <span>Professional Quality</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.heroVisual}>
+              <div className={styles.floatingCard}>
+                <div className={styles.cardIcon}>📄</div>
+                <div className={styles.cardText}>PDF Merger Pro</div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.heroActions}>
+            <SignInButton mode="modal">
+              <button className={styles.ctaButton}>
+                <span>Get Started Free</span>
+                <div className={styles.buttonShine}></div>
+              </button>
+            </SignInButton>
+            <p className={styles.ctaSubtext}>No credit card required • 5 free merges daily</p>
+          </div>
         </div>
       </SignedOut>
-
-      <SignedIn>
-        <div className={styles.header}>
-          <h1>PDF Merger</h1>
-          <p>Merge multiple PDF files into one document</p>
-        </div>
-
-        {/* Usage Stats */}
-        <div className={styles.usageStats}>
-          <div className={styles.usageInfo}>
-            <h3>Daily merges: {dailyGenerations}/{maxFreeDailyMerges}</h3>
-            <div className={styles.progressBar}>
-              <div 
-                className={styles.progressFill} 
-                style={{ width: `${(dailyGenerations / maxFreeDailyMerges) * 100}%` }}
-              ></div>
-            </div>
-            {dailyGenerations >= maxFreeDailyMerges ? (
-              <p className={styles.limitReached}>Daily limit reached! Resets at midnight.</p>
-            ) : (
-              <p className={styles.resetInfo}>Resets at midnight ({resetTime})</p>
-            )}
-            <p className={styles.totalInfo}>Total merges: {userGenerations}</p>
-          </div>
-        </div>
-
-        <div 
-          className={styles.uploadArea}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-        >
-          <div className={styles.uploadContent}>
-            <i className="ri-upload-cloud-2-line"></i>
-            <h3>Drag & Drop PDF Files</h3>
-            <p>or click to select files</p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".pdf"
-              onChange={(e) => handleFileSelect(e.target.files)}
-              style={{ display: 'none' }}
-            />
-            <button 
-              className={styles.selectButton}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Select PDF Files
-            </button>
-          </div>
-        </div>
-
-        {files.length > 0 && (
-          <div className={styles.fileList}>
-            <h3>Selected Files ({files.length})</h3>
-            {files.map((fileObj, index) => (
-              <div key={fileObj.id} className={styles.fileItem}>
-                <div className={styles.fileInfo}>
-                  <i className="ri-file-pdf-line"></i>
                   <span>{fileObj.file.name}</span>
                   <span className={styles.fileSize}>
                     ({(fileObj.file.size / 1024 / 1024).toFixed(2)} MB)
