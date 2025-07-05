@@ -29,7 +29,7 @@ export async function connectToDatabase() {
 export async function getUserGenerations(userId: string) {  
   const { db } = await connectToDatabase();  
   const user = await db.collection('users').findOne({ userId });  
-  return user?.totalMerges || 0; // Changed from generations to totalMerges  
+  return user?.totalMerges || 0;  
 }  
   
 export async function getUserDailyGenerations(userId: string) {  
@@ -47,7 +47,7 @@ export async function getUserDailyGenerations(userId: string) {
   lastUsedDate.setHours(0, 0, 0, 0);  
     
   if (lastUsedDate.getTime() === today.getTime()) {  
-    return user.dailyMerges || 0; // Changed from dailyGenerations to dailyMerges  
+    return user.dailyMerges || 0;  
   }  
     
   return 0;  
@@ -79,9 +79,9 @@ export async function incrementUserGenerations(userId: string) {
   const result = await db.collection('users').updateOne(  
     { userId },  
     {   
-      $inc: { totalMerges: 1 }, // Changed from generations to totalMerges  
+      $inc: { totalMerges: 1 },  
       $set: {   
-        dailyMerges, // Changed from dailyGenerations to dailyMerges  
+        dailyMerges,  
         lastUsed: today  
       },  
       $setOnInsert: { createdAt: new Date() }  
@@ -94,7 +94,7 @@ export async function incrementUserGenerations(userId: string) {
 export async function canUserMerge(userId: string, isPro: boolean = false) {  
   if (isPro) return true;  
     
-  const dailyMerges = await getUserDailyGenerations(userId); // Updated variable name  
+  const dailyMerges = await getUserDailyGenerations(userId);  
   const MAX_FREE_DAILY_MERGES = 5;  
     
   return dailyMerges < MAX_FREE_DAILY_MERGES;  
@@ -117,11 +117,16 @@ export async function updateUserSubscription(userId: string, subscriptionData: a
       },  
       $setOnInsert: {   
         createdAt: new Date(),  
-        totalMerges: 0, // Changed from generations to totalMerges  
-        dailyMerges: 0 // Changed from dailyGenerations to dailyMerges  
+        totalMerges: 0,  
+        dailyMerges: 0  
       }  
     },  
     { upsert: true }  
   );  
   return result;  
-}
+}  
+  
+export async function isUserPro(userId: string): Promise<boolean> {  
+  const user = await getUserSubscription(userId);  
+  return user?.status === 'active' && user?.paypalSubscriptionId;  
+    }
