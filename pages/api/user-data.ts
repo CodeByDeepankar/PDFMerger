@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';  
+import type { NextApiRequest, NextApiResponse } from 'next';  
 import { getAuth } from '@clerk/nextjs/server';  
 import { connectToDatabase } from '../../lib/mongodb';  
   
@@ -9,6 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   try {  
     const { userId } = getAuth(req);  
+      
     if (!userId) {  
       return res.status(401).json({ error: 'Unauthorized' });  
     }  
@@ -31,9 +32,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }  
   
     return res.status(200).json({  
-      totalGenerations: user?.totalMerges || 0, // Consistent field naming  
+      totalGenerations: user?.totalMerges || 0,  
       dailyGenerations: dailyGenerations,  
-      subscriptionStatus: user?.subscriptionStatus || 'free'  
+      isPro: user?.status === 'active' && user?.paypalSubscriptionId  
     });  
   
   } catch (error) {  
